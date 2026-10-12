@@ -18,7 +18,9 @@ DEFS=		@DEFS@
 
 INCLDIR=	$(srcdir)/../Include
 OPT=		@OPT@
-CFLAGS=		$(OPT) -I$(INCLDIR) -I.. $(DEFS)
+# Compile this K&R-era source with a compatible C dialect.
+LEGACY_CFLAGS ?= -std=gnu89 -Wno-implicit-int -Wno-implicit-function-declaration -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-return-type -Wno-deprecated-non-prototype
+CFLAGS=		$(OPT) $(LEGACY_CFLAGS) -I.. -I$(INCLDIR) $(DEFS)
 
 MKDEP=		mkdep
 SHELL=		/bin/sh

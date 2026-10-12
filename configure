@@ -312,6 +312,9 @@ if test ! -r $srcdir/$ac_unique_file; then
   fi
 fi
 
+# The feature probes below also contain K&R-era C and implicit declarations.
+# Modern compiler defaults otherwise misidentify working system features.
+CFLAGS=${CFLAGS-'-std=gnu89 -Wno-implicit-int -Wno-implicit-function-declaration -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-return-type'}
 ac_ext=c
 ac_cpp='${CPP} $CFLAGS'
 ac_compile='${CC-cc} $CFLAGS $LDFLAGS conftest.${ac_ext} -o conftest $LIBS >/dev/null 2>&1'
@@ -2301,4 +2304,3 @@ exit 0
 EOF
 chmod +x config.status
 test -n "$no_create" || ${CONFIG_SHELL-/bin/sh} config.status
-

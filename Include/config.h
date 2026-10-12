@@ -1,3 +1,8 @@
+/* Unix builds use the configuration generated in the build directory.
+   Keep the historical defaults below for manually configured platforms. */
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#else
 /* Include/config.h.  Generated automatically by configure.  */
 /* NOTE: config.h.in is converted into config.h by the configure
    script in the toplevel directory.
@@ -80,3 +85,4 @@
 #define	WITH_READLINE 1  		/* GNU readline() should be used */
 /* #undef	USE_THREAD */		/* Build in thread support */
 /* #undef	SOLARIS */			/* This is SOLARIS 2.x */
+#endif /* HAVE_CONFIG_H */

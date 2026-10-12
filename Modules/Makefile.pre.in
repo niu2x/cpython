@@ -35,7 +35,9 @@ prefix=		/usr/local
 
 INCLDIR=	$(srcdir)/../Include
 OPT=		@OPT@
-CFLAGS=		$(OPT) -I$(INCLDIR) -I.. $(DEFS)
+# Compile this K&R-era source with a compatible C dialect.
+LEGACY_CFLAGS ?= -std=gnu89 -Wno-implicit-int -Wno-implicit-function-declaration -Wno-int-conversion -Wno-incompatible-pointer-types -Wno-return-type -Wno-deprecated-non-prototype
+CFLAGS=		$(OPT) $(LEGACY_CFLAGS) -I.. -I$(INCLDIR) $(DEFS)
 
 MKDEP=		mkdep
 SHELL=		/bin/sh
@@ -58,17 +60,18 @@ SYSLIBS=	$(LIBM) $(LIBC)
 
 # === Rules ===
 
-all:		$(LIB) ../python
+PYTHON ?= python-early
+
+all:		$(LIB) ../$(PYTHON)
 
 $(LIB):		$(OBJS)
 		-rm -f $(LIB)
 		$(AR) cr $(LIB) $(OBJS)
 		$(RANLIB) $(LIB)
 
-../python:	config.o $(MYLIBS)
+../$(PYTHON):	config.o $(MYLIBS)
 		$(CC) $(OPT) config.o \
-		      $(MYLIBS) $(MODLIBS) $(LIBS) $(SYSLIBS) -o python
-		mv python ../python
+		      $(MYLIBS) $(MODLIBS) $(LIBS) $(SYSLIBS) -o $@
 
 config.o:	config.c Makefile $(MYLIBS)
 		$(CC) $(CFLAGS) -DPYTHONPATH=\"$(PYTHONPATH)\" -c config.c
@@ -93,7 +96,7 @@ depend:
 		$(MKDEP) $(CFLAGS) `echo $(OBJS) | tr ' ' '\012' | \
 					sed 's|\(.*\)\.o|$(srcdir)/\1.c|'`
 
-.PRECIOUS:	../python
+.PRECIOUS:	../$(PYTHON)
 
 glmodule.c:	$(srcdir)/cgen.py $(srcdir)/cstubs
 		python $(srcdir)/cgen.py <$(srcdir)/cstubs >glmodule.c
