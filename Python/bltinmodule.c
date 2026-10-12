@@ -1355,6 +1355,7 @@ object *SystemExit;
 object *TypeError;
 object *ValueError;
 object *ZeroDivisionError;
+object *AssertionError;
 
 static object *
 newstdexception(name)
@@ -1369,6 +1370,7 @@ newstdexception(name)
 static void
 initerrors()
 {
+	AssertionError = newstdexception("AssertionError");
 	AccessError = newstdexception("AccessError");
 	AttributeError = newstdexception("AttributeError");
 	ConflictError = newstdexception("ConflictError");

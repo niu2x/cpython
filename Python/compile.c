@@ -1419,6 +1419,35 @@ com_print_stmt(c, n)
 		/* XXX Alternatively, LOAD_CONST '\n' and then PRINT_ITEM */
 }
 
+static void com_assert_stmt(struct compiling *c, node *n) {
+	REQ(n, assert_stmt);
+	com_node(c, CHILD(n, 1));
+
+	int anchor = 0;
+	com_addfwref(c, JUMP_IF_TRUE, &anchor);
+
+	object * exp_type = newstringobject("AssertionError");
+	com_addoparg(c, LOAD_NAME, com_addname(c, exp_type));
+	DECREF(exp_type);
+
+	if(NCH(n) > 3) {
+		com_node(c, CHILD(n, 3));
+	}
+	else {
+
+		object * empty_msg = newstringobject("");
+		com_addoparg(c, LOAD_CONST, com_addconst(c, empty_msg));
+		DECREF(empty_msg);
+	}
+
+	com_addbyte(c, RAISE_EXCEPTION);
+
+	if(anchor) {
+		com_backpatch(c, anchor);
+	}
+	com_addbyte(c, POP_TOP);
+}
+
 static void
 com_return_stmt(c, n)
 	struct compiling *c;
@@ -2137,7 +2166,9 @@ com_node(c, n)
 	case atom:
 		com_atom(c, n);
 		break;
-	
+	case assert_stmt:
+		com_assert_stmt(c, n);
+		break;
 	default:
 		fprintf(stderr, "node type %d\n", TYPE(n));
 		err_setstr(SystemError, "com_node: unexpected node type");
