@@ -8,9 +8,12 @@
 
 ## 作业顺序
 
-1. [字节码检查工具](01-bytecode-inspector.md)
-2. [添加 assert 语句](02-assert-statement.md)
-3. [frame 分配失败路径](03-frame-allocation-failure.md)
+1. [给 list 增加 extend 和 pop 方法](01-list-methods.md)
+2. [添加 assert 语句](02-assert-statement.md)（已通过评审，见 [评审记录](02-assert-statement.review.md)）
+3. [实现 `**` 幂运算符](03-power-operator.md)
+4. [给字符串对象加方法支持](04-string-methods.md)
+5. [新增 `list()` 与 `dict()` 内建构造器](05-container-builtins.md)
+6. [实现增强赋值（`+=` 等）](06-augmented-assignment.md)
 
 一次只做一道题，上一题通过评审后再开始下一题。第一题现在可以开始。
 
