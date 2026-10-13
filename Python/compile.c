@@ -1427,7 +1427,14 @@ static void com_assert_stmt(struct compiling *c, node *n) {
 	com_addfwref(c, JUMP_IF_TRUE, &anchor);
 
 	object * exp_type = newstringobject("AssertionError");
-	com_addoparg(c, LOAD_NAME, com_addname(c, exp_type));
+
+	if(dictlookup(c->c_globals, "AssertionError") == NULL) {
+		com_addoparg(c, LOAD_NAME, com_addname(c, exp_type));
+	}
+	else{
+		com_addoparg(c, LOAD_GLOBAL, com_addname(c, exp_type));
+	}
+
 	DECREF(exp_type);
 
 	if(NCH(n) > 3) {
