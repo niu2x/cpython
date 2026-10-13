@@ -501,6 +501,79 @@ listappend(self, args)
 	return ins(self, (int) self->ob_size, v);
 }
 
+static object *
+listpop(self, args)
+	listobject *self;
+	object *args;
+{
+	int index;
+	int i;
+	object *r;
+
+	if (args == NULL)
+		index = self->ob_size - 1;
+	else if (!getargs(args, "i", &index))
+		return NULL;
+
+	if (index < 0)
+		index += self->ob_size;
+	if (index < 0 || index >= self->ob_size) {
+		if (self->ob_size == 0)
+			err_setstr(IndexError, "pop from empty list");
+		else
+			err_setstr(IndexError, "pop index out of range");
+		return NULL;
+	}
+
+	r = self->ob_item[index];
+	for (i = index; i + 1 < self->ob_size; i++)
+		self->ob_item[i] = self->ob_item[i+1];
+	self->ob_size--;
+	return r;
+}
+
+static object *
+listextend(self, args)
+	listobject *self;
+	object *args;
+{
+	object *v;
+	sequence_methods *sq;
+	int len;
+	int i;
+	object *item;
+	object *r;
+
+	if (!getargs(args, "O", &v))
+		return NULL;
+
+	sq = v->ob_type->tp_as_sequence;
+	if (sq == NULL || sq->sq_length == NULL || sq->sq_item == NULL) {
+		err_setstr(TypeError,
+			   "list.extend() argument must be a sequence");
+		return NULL;
+	}
+
+	/* Capture the length once so that l.extend(l) terminates. */
+	len = (*sq->sq_length)(v);
+	if (len < 0)
+		return NULL;
+
+	for (i = 0; i < len; i++) {
+		item = (*sq->sq_item)(v, i);
+		if (item == NULL)
+			return NULL;
+		r = ins(self, (int) self->ob_size, item);
+		DECREF(item);
+		if (r == NULL)
+			return NULL;
+		DECREF(r);
+	}
+
+	INCREF(None);
+	return None;
+}
+
 static object *comparefunc;
 
 static int
@@ -699,6 +772,8 @@ listremove(self, args)
 
 static struct methodlist list_methods[] = {
 	{"append",	(method)listappend},
+	{"pop",	(method)listpop},
+	{"extend",	(method)listextend},
 	{"count",	(method)listcount},
 	{"index",	(method)listindex},
 	{"insert",	(method)listinsert},
